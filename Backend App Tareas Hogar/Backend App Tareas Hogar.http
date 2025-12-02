@@ -1,0 +1,6 @@
+@Backend_App_Tareas_Hogar_HostAddress = http://localhost:5092
+
+GET {{Backend_App_Tareas_Hogar_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
