@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend_App_Tareas_Hogar.Models
 {
+    [Table("users")] // Nombre de la tabla en la base de datos
     public class User
     {
         [Key] // Clave primaria
@@ -28,12 +29,9 @@ namespace Backend_App_Tareas_Hogar.Models
         [Required(ErrorMessage = "La contraseña es Obligatoria")] // Campo obligatorio
         public string Password { get; set; }
 
-        // Rol principal (FK)
-        [Column("role_id")] // Nombre de la columna en la base de datos 
-        [ForeignKey("Role")]
-        [Required(ErrorMessage = "El rol es obligatorio")] // Campo obligatorio 
-        public int RoleId { get; set; }                             
-        public Role Role { get; set; }                              
+        [Column("age")] // Nombre de la columna en la base de datos
+        [Required(ErrorMessage = "La Edad es Obligatoria")]
+        public int Age { get; set; } // Edad del usuario                         
 
         // Relaciones adicionales
         public ICollection<UserRole> UserRoles { get; set; }        // Si se permiten múltiples roles.

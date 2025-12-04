@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend_App_Tareas_Hogar.Models
 {
+    [Table("user_permissions")] // Nombre de la tabla en la base de datos
     public class UserPermission
     {
         [Key] // Clave primaria

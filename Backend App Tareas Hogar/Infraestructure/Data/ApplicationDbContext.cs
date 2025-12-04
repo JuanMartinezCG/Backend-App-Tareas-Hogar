@@ -8,7 +8,6 @@ namespace Backend_App_Tareas_Hogar.Infraestructure.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
-
         public DbSet<User> Users { get; set; }
         public DbSet<UserToken> UserTokens { get; set; }
         public DbSet<Role> Roles { get; set; }
