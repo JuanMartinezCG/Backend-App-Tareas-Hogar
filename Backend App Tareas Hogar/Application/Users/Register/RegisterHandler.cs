@@ -1,7 +1,7 @@
-﻿using Backend_App_Tareas_Hogar.Application.Helpers;
-using Backend_App_Tareas_Hogar.Infraestructure.Data;
+﻿using Backend_App_Tareas_Hogar.Infraestructure.Data;
 using Backend_App_Tareas_Hogar.Models;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend_App_Tareas_Hogar.Application.Users.Register
@@ -9,24 +9,26 @@ namespace Backend_App_Tareas_Hogar.Application.Users.Register
     public class RegisterHandler : IRequestHandler<RegisterCommand, RegisterResponse>
     {
         private readonly ApplicationDbContext _DBcontext;
+        private readonly PasswordHasher<User> _passwordHasher;
         public RegisterHandler(ApplicationDbContext DBcontext)
         {
             _DBcontext = DBcontext;
+            _passwordHasher = new PasswordHasher<User>();
         }
 
         public async Task<RegisterResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
-            string hashedPassword = PasswordHasher.Hash(request.Password);
-
             // Crear nuevo usuario
             var user  = new User
             {
-                Name =  request.Name,
-                LastName = request.LastName,
-                Username = request.UserName,
-                Password = hashedPassword,
+                Name =  request.Name.ToUpper(),
+                LastName = request.LastName.ToUpper(),
+                Username = request.UserName.ToUpper(),
                 Age = request.Age
             };
+
+            // Hashear contraseña
+            user.Password = _passwordHasher.HashPassword(user, request.Password.Trim());
 
             // Obtener roles desde la base de datos
             var roles = await _DBcontext.Roles
