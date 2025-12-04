@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend_App_Tareas_Hogar.Models
 {
+    [Table("user_roles")] // Nombre de la tabla en la base de datos
     public class UserRole
     {
         [Key] // Clave primaria
