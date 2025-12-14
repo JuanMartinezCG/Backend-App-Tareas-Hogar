@@ -1,6 +1,8 @@
 
 using Backend_App_Tareas_Hogar.Application.Users.Register;
 using Backend_App_Tareas_Hogar.Infraestructure.Data;
+using Backend_App_Tareas_Hogar.Infraestructure.Interfaces;
+using Backend_App_Tareas_Hogar.Infraestructure.Services;
 using Backend_App_Tareas_Hogar.Utilities.Helpers;
 using Backend_App_Tareas_Hogar.Utilities.Helpers.Validators;
 using FluentValidation;
@@ -9,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,28 +39,39 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-var jwtKey = builder.Configuration["Jwt:Key"];
-var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+// ------------------------------------------------------------------
+// JWT CONFIGURATION
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
+var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
+
+builder.Services
+    .AddAuthentication(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtIssuer,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-        ClockSkew = TimeSpan.Zero
-    };
-});
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
 
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(key)
+        };
+    });
+
+// Servicio JWT
+builder.Services.AddSingleton<IJwtService, JwtService>();
+
+// ------------------------------------------------------------------
 
 builder.Services.AddMediatR(cfg =>
 {
@@ -90,6 +104,9 @@ app.UseExceptionHandler(appBuilder =>
             BadHttpRequestException => StatusCodes.Status400BadRequest,
             KeyNotFoundException => StatusCodes.Status404NotFound,
             ValidationException => StatusCodes.Status400BadRequest,
+            NpgsqlException => StatusCodes.Status400BadRequest,
+            DbUpdateException => StatusCodes.Status400BadRequest,
+            InvalidOperationException => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status500InternalServerError
         };
 
@@ -103,6 +120,36 @@ app.UseExceptionHandler(appBuilder =>
                 status = 400,
                 message = "Error de validación",
                 errors = validationEx.Errors.Select(e => e.ErrorMessage).ToList()
+            };
+        }
+        else if(exception is NpgsqlException)
+        {
+            // Manejo específico para errores de Postgres
+            response = new
+            {
+                status = context.Response.StatusCode,
+                message = "Error en la base de datos (Postgres).",
+                detail = exception.Message
+            };
+        }
+        else if (exception is DbUpdateException)
+        {
+            // Manejo específico para errores de actualización de la base de datos
+            response = new
+            {
+                status = context.Response.StatusCode,
+                message = "No se pudo guardar cambios en la base de datos.",
+                detail = exception.Message
+            };
+        }
+        else if (exception is InvalidOperationException)
+        {
+            // Manejo específico para InvalidOperationException
+            response = new
+            {
+                status = context.Response.StatusCode,
+                message = "Operación inválida al interactuar con los datos.",
+                detail = exception.Message
             };
         }
         else
@@ -121,8 +168,6 @@ app.UseExceptionHandler(appBuilder =>
 
 
 app.UseHttpsRedirection();
-
-app.UseDatabaseExceptionMiddleware();
 
 app.UseAuthorization();
 
