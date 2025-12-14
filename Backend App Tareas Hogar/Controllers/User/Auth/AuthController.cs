@@ -1,4 +1,5 @@
 ﻿using Backend_App_Tareas_Hogar.Application.Users.Login;
+using Backend_App_Tareas_Hogar.Application.Users.Logout;
 using Backend_App_Tareas_Hogar.Application.Users.RefreshToken;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -27,10 +28,18 @@ namespace Backend_App_Tareas_Hogar.Controllers.User.Auth
             return Ok(result);
         }
 
-       [HttpPost("refresh")]
+       [HttpPost("refresh")] // URL: api/auth/refresh
        [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
        [AllowAnonymous]
         public async Task<IActionResult> Refresh([FromBody] RefreshTokenCommand request)
+        {
+            var result = await _mediator.Send(request);
+            return Ok(result);
+        }
+
+        [HttpPost("logout")] // URL: api/auth/logout
+        [ProducesResponseType(typeof(LogoutResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Logout([FromBody] LogoutCommand request)
         {
             var result = await _mediator.Send(request);
             return Ok(result);

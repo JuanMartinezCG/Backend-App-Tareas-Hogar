@@ -13,7 +13,7 @@ namespace Backend_App_Tareas_Hogar.Application.Users.RefreshToken
 
     public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand>
     {
-        public RefreshTokenCommandValidator(ApplicationDbContext dbContext)
+        public RefreshTokenCommandValidator()
         {
             RuleFor(x => x.RefreshToken)
                 .NotEmpty().WithMessage("El refresh token es obligatorio.");

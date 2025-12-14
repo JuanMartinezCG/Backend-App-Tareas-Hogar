@@ -1,10 +1,11 @@
 ﻿using Backend_App_Tareas_Hogar.Infraestructure.Data;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 
 namespace Backend_App_Tareas_Hogar.Application.Users.Logout
 {
-    public class LogoutHandler
+    public class LogoutHandler : IRequestHandler<LogoutCommand, LogoutResponse>
     {
         private readonly ApplicationDbContext _dbContext;
 
