@@ -23,7 +23,7 @@ namespace Backend_App_Tareas_Hogar.Application.Users.Register
             {
                 Name =  request.Name.ToUpper(),
                 LastName = request.LastName.ToUpper(),
-                Username = request.UserName.ToUpper(),
+                Username = request.UserName,
                 Age = request.Age
             };
 
