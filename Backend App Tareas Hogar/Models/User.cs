@@ -31,7 +31,13 @@ namespace Backend_App_Tareas_Hogar.Models
 
         [Column("age")] // Nombre de la columna en la base de datos
         [Required(ErrorMessage = "La Edad es Obligatoria")]
-        public int Age { get; set; } // Edad del usuario                         
+        public int Age { get; set; } // Edad del usuario
+        
+        [Column("created_at")] // Nombre de la columna en la base de datos
+        public DateTime CreatedAt { get; set; } // Fecha de creación del usuario
+
+        [Column("updated_at")] // Nombre de la columna en la base de datos
+        public DateTime UpdatedAt { get; set; } // Fecha de actualización del usuario
 
         // Relaciones adicionales
         public ICollection<UserRole> UserRoles { get; set; }        // Si se permiten múltiples roles.

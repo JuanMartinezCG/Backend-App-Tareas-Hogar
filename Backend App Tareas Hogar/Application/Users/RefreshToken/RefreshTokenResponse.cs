@@ -1,5 +1,4 @@
-﻿using Backend_App_Tareas_Hogar.Application.Users.Login;
-
+﻿
 namespace Backend_App_Tareas_Hogar.Application.Users.RefreshToken
 {
     public class RefreshTokenResponse
