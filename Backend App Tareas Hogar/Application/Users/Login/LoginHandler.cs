@@ -29,24 +29,20 @@ namespace Backend_App_Tareas_Hogar.Application.Users.Login
 
             // Validación unificada (usuario inexistente o contraseña incorrecta)
             var resultHash = _passwordHasher.VerifyHashedPassword(user, user.Password, request.Password.Trim());
+
             if (user == null || resultHash == PasswordVerificationResult.Failed)
             {
                 return LoginResponse.InvalidCredentials();
             }
 
-
             // Construir lista de roles
             var roles = user.UserRoles.Select(r => r.Role.Name).ToList();
 
-            // Generar token
-            var token = _jwtService.GenerateToken(
-                user.Id,
-                user.Username,
-                roles
-            );
+            // Generar token y refresh token
+            var tokens = await _jwtService.GenerateAndSaveTokensAsync(user, roles);
 
             // Respuesta final
-            return LoginResponse.Success(token, roles);
+            return LoginResponse.Success(tokens.Token, tokens.Refreshtoken);
         }
     }
 }

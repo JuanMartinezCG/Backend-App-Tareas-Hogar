@@ -3,15 +3,15 @@
     public class LoginResponse
     {
         public string Token { get; set; }
-        public List<string> Roles { get; set; }
+        public string Refreshtoken { get; set; }
         public string Message { get; set; }
 
         // Factory: éxito
-        public static LoginResponse Success(string token, List<string> roles) =>
+        public static LoginResponse Success(string token, string refreshtoken) =>
             new LoginResponse
             {
                 Token = token,
-                Roles = roles,
+                Refreshtoken = refreshtoken,
                 Message = "Inicio de sesión exitoso."
             };
 
@@ -20,9 +20,15 @@
             new LoginResponse
             {
                 Token = "",
-                Roles = new List<string>(),
+                Refreshtoken = "",
                 Message = "Credenciales inválidas."
             };
+
+        public static LoginResponse Invalid(string message) =>
+        new()
+        {
+            Message = message
+        };
     }
 
 }
