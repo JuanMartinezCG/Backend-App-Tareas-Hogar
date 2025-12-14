@@ -32,16 +32,6 @@ namespace Backend_App_Tareas_Hogar.Models
         [Column("created_at")]
         [Required]
         public DateTime CreatedAt { get; set; } // Fecha de creación del token
-
-        [Column("revoked_at")]
-        [Required]
-        public DateTime? RevokedAt { get; set; } // Fecha de revocación del token, si aplica
-        
-        [Column("device_info")]
-        public string DeviceInfo { get; set; } // Información del dispositivo
-
-        [Column("ip_address")]
-        public string IpAddress { get; set; } // Dirección IP desde la que se generó el token
     }
 
 }

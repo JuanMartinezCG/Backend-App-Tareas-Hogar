@@ -3,7 +3,6 @@ using Backend_App_Tareas_Hogar.Application.Users.Register;
 using Backend_App_Tareas_Hogar.Infraestructure.Data;
 using Backend_App_Tareas_Hogar.Infraestructure.Interfaces;
 using Backend_App_Tareas_Hogar.Infraestructure.Services;
-using Backend_App_Tareas_Hogar.Utilities.Helpers;
 using Backend_App_Tareas_Hogar.Utilities.Helpers.Validators;
 using FluentValidation;
 using MediatR;
@@ -18,6 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ------------------ Servicios ------------------
 builder.Services.AddTransient<DbContext, ApplicationDbContext>();
+builder.Services.AddScoped<IJwtService, JwtService>(); // Servicio JWT
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -42,7 +42,7 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 // ------------------------------------------------------------------
 // JWT CONFIGURATION
 
-var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
+var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]);
 
 builder.Services
     .AddAuthentication(options =>
@@ -68,8 +68,6 @@ builder.Services
         };
     });
 
-// Servicio JWT
-builder.Services.AddSingleton<IJwtService, JwtService>();
 
 // ------------------------------------------------------------------
 
